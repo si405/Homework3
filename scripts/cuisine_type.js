@@ -3,7 +3,7 @@
 // want something spicy, not spicy or have no preference.
 
 module.exports = function(robot) {
-  robot.respond(/i'm hungry/i, function(msg) {
+  robot.respond(/.*?hungry.*?/i, function(msg) {
     // Define a list of cuisine types that are not spicy, moderate or spicy
     // Return a suggested cuisine style based on the style of food the user
     // wants.

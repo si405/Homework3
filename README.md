@@ -41,6 +41,4 @@ This process calls the BART real-time departures API for the required departure 
 
 
 ** Current Status **
-This function is not yet working due to an issue returning the data to the bot. The function is working to the point where it successfully gets the correct data and builds the array of train options but it is not being returned successfully to the calling function.
-
-The test file bart2.js in /myhubot shows a working example that can be run by entering node bart2.js
+The previous issue has been fixed. The issue was ordering the callbacks so that responding to the hubot occurred after the call to get the BART data.
