@@ -18,17 +18,26 @@ var apikey = 'ZZLI-UU93-IMPQ-DT35';
 
 module.exports = function(robot) {
   robot.respond(/next bart/i, function(msg) {
-    msg.reply(getDepartures(station, apikey, msg.message));
+	getDepartures(station, apikey, function(departures) {
+	  msg.reply("The next trains from " + station + " are: " + departures.toString());
+    });
   });
 }
 
-function getDepartures(station,apikey,message) {
+//getDepartures(station, apikey, function (departures) {
+	// Now you can do more work with your departures
+//	console.log(departures);
+//});
+
+function getDepartures(station,apikey,callback) {
 // This function takes the desired BART station and calls the BART estimated time of departure
 // API to find the next departures from this station.
     var url = "http://api.bart.gov/api/etd.aspx?cmd=etd&orig="+station+"&key="+apikey;
 
 // Define an array to hold the returned information.
     var departures = [];
+
+// Call the BART API to get the results in XML
     request(url, function (err, resp, body) {
       if (err) throw err;
       parseString(body, function (err, json) {
@@ -36,17 +45,19 @@ function getDepartures(station,apikey,message) {
         e.estimate.forEach(function (departure) {
           // At this point I'm only interested in trains on the PITT line but
           // can't just check for PITT as there are other trains to Pleasant Hill
-          // and Concord that also work. All those trains are on the "yellow" line.
-          if (departure.color == 'YELLOW' && departure.direction == 'North' {
-            //console.log(e.abbreviation, departure.minutes);
-            departures.push(e.abbreviation+" in "+departure.minutes+ "mins");
+          // and Concord that also work. All those trains are on the "yellow" line
+          // and head north.
+          if (departure.color == 'YELLOW' && departure.direction  == 'North') {
+            // BART uses the word "leaving" instead of '0 minutes' so check for this and ignore
+            // those trains
+              if (departure.minutes != 'Leaving') {
+                departures.push(e.abbreviation+" in "+departure.minutes+ " mins");
+            }
           }
         });
       });
-      // Console logging at this point shows the correct data but returning the data does not.
-      // Need to figure out why!
-      console.log(departures);
-      return(departures);
+      // Return the departures array containing the desired information.
+      callback(departures);
     });
     });
 };
